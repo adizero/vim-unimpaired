@@ -611,8 +611,10 @@ function! UnimpairedMapTransform(algorithm, key) abort
   return ''
 endfunction
 
-exe UnimpairedMapTransform('string_encode','[y')
-exe UnimpairedMapTransform('string_decode',']y')
+" [y and ]y will be used for yanky yang ring cycling after put(paste)
+" exe UnimpairedMapTransform('string_encode','[y')
+" exe UnimpairedMapTransform('string_decode',']y')
+
 exe UnimpairedMapTransform('string_encode','[C')
 exe UnimpairedMapTransform('string_decode',']C')
 exe UnimpairedMapTransform('url_encode','[u')
