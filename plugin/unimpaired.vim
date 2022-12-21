@@ -36,7 +36,6 @@ endfunction
 
 function! s:MapNextFamily(map, cmd, current) abort
   let prefix = '<Plug>(unimpaired-' . a:cmd
-  let map = '<Plug>unimpaired'.toupper(a:map)
   let cmd = '".(v:count ? v:count : "")."'.a:cmd
   let zv = (a:cmd ==# 'l' || a:cmd ==# 'c' ? 'zv' : '')
   let end = '"<CR>'.zv
@@ -44,10 +43,6 @@ function! s:MapNextFamily(map, cmd, current) abort
   execute 'nnoremap <silent> '.prefix.'next)     :<C-U>exe "'.cmd.'next'.end
   execute 'nnoremap '.prefix.'first)    :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'first"<CR><CR>' . zv
   execute 'nnoremap '.prefix.'last)     :<C-U><C-R>=v:count ? v:count . "' . a:current . '" : "' . a:cmd . 'last"<CR><CR>' . zv
-  execute 'nnoremap <silent> '.map.'Previous :<C-U>exe "'.cmd.'previous'.end
-  execute 'nnoremap <silent> '.map.'Next     :<C-U>exe "'.cmd.'next'.end
-  execute 'nnoremap <silent> '.map.'First    :<C-U>exe "'.cmd.'first'.end
-  execute 'nnoremap <silent> '.map.'Last     :<C-U>exe "'.cmd.'last'.end
   exe s:Map('n', '['.        a:map , prefix.'previous)')
   exe s:Map('n', ']'.        a:map , prefix.'next)')
   exe s:Map('n', '['.toupper(a:map), prefix.'first)')
@@ -55,15 +50,11 @@ function! s:MapNextFamily(map, cmd, current) abort
   if a:cmd ==# 'c' || a:cmd ==# 'l'
     execute 'nnoremap <silent> '.prefix.'pfile)  :<C-U>exe "'.cmd.'pfile'.end
     execute 'nnoremap <silent> '.prefix.'nfile)  :<C-U>exe "'.cmd.'nfile'.end
-    execute 'nnoremap <silent> '.map.'PFile :<C-U>exe "'.cmd.'pfile'.end
-    execute 'nnoremap <silent> '.map.'NFile :<C-U>exe "'.cmd.'nfile'.end
     exe s:Map('n', '[<C-'.toupper(a:map).'>', prefix.'pfile)')
     exe s:Map('n', ']<C-'.toupper(a:map).'>', prefix.'nfile)')
   elseif a:cmd ==# 't'
     nnoremap <silent> <Plug>(unimpaired-ptprevious) :<C-U>exe v:count1 . "ptprevious"<CR>
     nnoremap <silent> <Plug>(unimpaired-ptnext) :<C-U>exe v:count1 . "ptnext"<CR>
-    execute 'nnoremap <silent> '.map.'PPrevious :<C-U>exe "p'.cmd.'previous'.end
-    execute 'nnoremap <silent> '.map.'PNext :<C-U>exe "p'.cmd.'next'.end
     exe s:Map('n', '[<C-T>', '<Plug>(unimpaired-ptprevious)')
     exe s:Map('n', ']<C-T>', '<Plug>(unimpaired-ptnext)')
   endif
