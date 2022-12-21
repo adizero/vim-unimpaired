@@ -164,8 +164,6 @@ endfunction
 
 nnoremap <silent> <Plug>(unimpaired-directory-next)     :<C-U>execute <SID>NextFileEntry(v:count1)<CR>
 nnoremap <silent> <Plug>(unimpaired-directory-previous) :<C-U>execute <SID>PreviousFileEntry(v:count1)<CR>
-nnoremap <silent> <Plug>unimpairedDirectoryNext     :<C-U>execute <SID>NextFileEntry(v:count1)<CR>
-nnoremap <silent> <Plug>unimpairedDirectoryPrevious :<C-U>execute <SID>PreviousFileEntry(v:count1)<CR>
 exe s:Map('n', ']f', '<Plug>(unimpaired-directory-next)')
 exe s:Map('n', '[f', '<Plug>(unimpaired-directory-previous)')
 
@@ -184,13 +182,6 @@ exe s:Map('x', '[n', '<Plug>(unimpaired-context-previous)')
 exe s:Map('x', ']n', '<Plug>(unimpaired-context-next)')
 exe s:Map('o', '[n', '<Plug>(unimpaired-context-previous)')
 exe s:Map('o', ']n', '<Plug>(unimpaired-context-next)')
-
-nnoremap <silent> <Plug>unimpairedContextPrevious :<C-U>call <SID>Context(1)<CR>
-nnoremap <silent> <Plug>unimpairedContextNext     :<C-U>call <SID>Context(0)<CR>
-xnoremap <silent> <Plug>unimpairedContextPrevious :<C-U>exe 'normal! gv'<Bar>call <SID>Context(1)<CR>
-xnoremap <silent> <Plug>unimpairedContextNext     :<C-U>exe 'normal! gv'<Bar>call <SID>Context(0)<CR>
-onoremap <silent> <Plug>unimpairedContextPrevious :<C-U>call <SID>ContextMotion(1)<CR>
-onoremap <silent> <Plug>unimpairedContextNext     :<C-U>call <SID>ContextMotion(0)<CR>
 
 function! s:Context(reverse) abort
   call search('^\(@@ .* @@\|[<=>|]\{7}[<=>|]\@!\)', a:reverse ? 'bW' : 'W')
@@ -228,30 +219,33 @@ endfunction
 
 " Section: Line operations
 
-function! s:BlankUp() abort
-  let cmd = 'put!=repeat(nr2char(10), v:count1)|silent '']+'
-  if &modifiable
-    let cmd .= '|silent! call repeat#set("\<Plug>(unimpaired-blank-up)", v:count1)'
+function! s:AddBlank(count, is_visual, direction) abort
+  let after_line = ''
+  if a:is_visual
+    if a:direction == 'down'
+      let after_line = line("'>")
+    endif
   endif
-  return cmd
+  let cmd = after_line . 'put' . (a:direction == 'up' ? '!' : '') . '=repeat(nr2char(10), ' . a:count . ')'
+
+  normal! m`
+  silent! exe cmd
+  normal! ``
+  silent! call repeat#set("\<Plug>(unimpaired-blank-" . a:direction . ")", a:count)
+  if a:is_visual
+    normal! gv
+  endif
 endfunction
 
-function! s:BlankDown() abort
-  let cmd = 'put =repeat(nr2char(10), v:count1)|silent ''[-'
-  if &modifiable
-    let cmd .= '|silent! call repeat#set("\<Plug>(unimpaired-blank-down)", v:count1)'
-  endif
-  return cmd
-endfunction
-
-nnoremap <silent> <Plug>(unimpaired-blank-up)   :<C-U>exe <SID>BlankUp()<CR>
-nnoremap <silent> <Plug>(unimpaired-blank-down) :<C-U>exe <SID>BlankDown()<CR>
-
-nnoremap <silent> <Plug>unimpairedBlankUp   :<C-U>exe <SID>BlankUp()<CR>
-nnoremap <silent> <Plug>unimpairedBlankDown :<C-U>exe <SID>BlankDown()<CR>
+nnoremap <silent> <Plug>(unimpaired-blank-up)   :<C-U>call <SID>AddBlank(v:count1, 0, 'up')<CR>
+nnoremap <silent> <Plug>(unimpaired-blank-down) :<C-U>call <SID>AddBlank(v:count1, 0, 'down')<CR>
+xnoremap <silent> <Plug>(unimpaired-blank-up)   :<C-U>call <SID>AddBlank(v:count1, 1, 'up')<CR>
+xnoremap <silent> <Plug>(unimpaired-blank-down) :<C-U>call <SID>AddBlank(v:count1, 1, 'down')<CR>
 
 exe s:Map('n', '[<Space>', '<Plug>(unimpaired-blank-up)')
 exe s:Map('n', ']<Space>', '<Plug>(unimpaired-blank-down)')
+exe s:Map('x', '[<Space>', '<Plug>(unimpaired-blank-up)')
+exe s:Map('x', ']<Space>', '<Plug>(unimpaired-blank-down)')
 
 function! s:ExecMove(cmd) abort
   let old_fdm = &foldmethod
@@ -285,15 +279,11 @@ nnoremap <silent> <Plug>(unimpaired-move-up)            :<C-U>call <SID>Move('--
 nnoremap <silent> <Plug>(unimpaired-move-down)          :<C-U>call <SID>Move('+',v:count1,'down')<CR>
 noremap  <silent> <Plug>(unimpaired-move-selection-up)   :<C-U>call <SID>MoveSelectionUp(v:count1)<CR>
 noremap  <silent> <Plug>(unimpaired-move-selection-down) :<C-U>call <SID>MoveSelectionDown(v:count1)<CR>
-nnoremap <silent> <Plug>unimpairedMoveUp            :<C-U>call <SID>Move('--',v:count1,'up')<CR>
-nnoremap <silent> <Plug>unimpairedMoveDown          :<C-U>call <SID>Move('+',v:count1,'down')<CR>
-noremap  <silent> <Plug>unimpairedMoveSelectionUp   :<C-U>call <SID>MoveSelectionUp(v:count1)<CR>
-noremap  <silent> <Plug>unimpairedMoveSelectionDown :<C-U>call <SID>MoveSelectionDown(v:count1)<CR>
 
 exe s:Map('n', '[e', '<Plug>(unimpaired-move-up)')
 exe s:Map('n', ']e', '<Plug>(unimpaired-move-down)')
-exe s:Map('x', '[e', '<Plug>(unimpaired-move-selection-up)')
-exe s:Map('x', ']e', '<Plug>(unimpaired-move-selection-down)')
+exe s:Map('x', '[e', '<Plug>(unimpaired-move-selection-up)gv')
+exe s:Map('x', ']e', '<Plug>(unimpaired-move-selection-down)gv')
 
 " Section: Option toggling
 
@@ -397,7 +387,6 @@ function! s:SetupPaste() abort
   augroup END
 endfunction
 
-nnoremap <silent> <Plug>unimpairedPaste :call <SID>SetupPaste()<CR>
 nmap <script><silent> <Plug>(unimpaired-paste) :<C-U>call <SID>SetupPaste()<CR>
 
 nmap <script><silent> <Plug>(unimpaired-enable)p  :<C-U>call <SID>SetupPaste()<CR>O
@@ -426,8 +415,6 @@ nnoremap <silent> <Plug>(unimpaired-put-above-leftward)  :<C-U>call <SID>putline
 nnoremap <silent> <Plug>(unimpaired-put-below-leftward)  :<C-U>call <SID>putline(v:count1 . ']p', 'Below')<CR><']
 nnoremap <silent> <Plug>(unimpaired-put-above-reformat)  :<C-U>call <SID>putline(v:count1 . '[p', 'Above')<CR>=']
 nnoremap <silent> <Plug>(unimpaired-put-below-reformat)  :<C-U>call <SID>putline(v:count1 . ']p', 'Below')<CR>=']
-nnoremap <silent> <Plug>unimpairedPutAbove :call <SID>putline('[p', 'above')<CR>
-nnoremap <silent> <Plug>unimpairedPutBelow :call <SID>putline(']p', 'below')<CR>
 
 exe s:Map('n', '[p', '<Plug>(unimpaired-put-above)')
 exe s:Map('n', ']p', '<Plug>(unimpaired-put-below)')
@@ -599,9 +586,6 @@ endfunction
 
 function! UnimpairedMapTransform(algorithm, key) abort
   let name = tr(a:algorithm, '_', '-')
-  exe 'nnoremap <expr> <Plug>unimpaired_'    .a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")'
-  exe 'xnoremap <expr> <Plug>unimpaired_'    .a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")'
-  exe 'nnoremap <expr> <Plug>unimpaired_line_'.a:algorithm.' <SID>TransformSetup("'.a:algorithm.'")."_"'
   exe 'nnoremap <expr> <Plug>(unimpaired-' . name . ') <SID>TransformSetup("'.a:algorithm.'")'
   exe 'xnoremap <expr> <Plug>(unimpaired-' . name . ') <SID>TransformSetup("'.a:algorithm.'")'
   exe 'nnoremap <expr> <Plug>(unimpaired-' . name . '-line) <SID>TransformSetup("'.a:algorithm.'")."_"'
