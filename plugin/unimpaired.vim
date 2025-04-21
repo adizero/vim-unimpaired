@@ -590,11 +590,11 @@ endfunction
 " exe UnimpairedMapTransform('string_encode','[y')
 " exe UnimpairedMapTransform('string_decode',']y')
 
-exe UnimpairedMapTransform('string_encode','[C')
-exe UnimpairedMapTransform('string_decode',']C')
-exe UnimpairedMapTransform('url_encode','[u')
-exe UnimpairedMapTransform('url_decode',']u')
-exe UnimpairedMapTransform('xml_encode','[x')
-exe UnimpairedMapTransform('xml_decode',']x')
+exe UnimpairedMapTransform('string_encode','[Ec')
+exe UnimpairedMapTransform('string_decode',']Ec')
+exe UnimpairedMapTransform('url_encode','[Eu')
+exe UnimpairedMapTransform('url_decode',']Eu')
+exe UnimpairedMapTransform('xml_encode','[Ex')
+exe UnimpairedMapTransform('xml_decode',']Ex')
 
 " vim:set sw=2 sts=2:
