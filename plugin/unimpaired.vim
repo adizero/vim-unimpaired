@@ -394,7 +394,7 @@ endif
 
 " Section: Put
 
-if get(g:, 'include_put_section', v:true)
+if get(g:, 'include_put_section', v:false)
   function! s:putline(how, map) abort
     let [body, type] = [getreg(v:register), getregtype(v:register)]
     if type ==# 'V'
